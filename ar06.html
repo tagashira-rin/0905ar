@@ -12,7 +12,9 @@
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
     <!-- Gesture Handler を読み込む -->
     <script src="https://raw.githack.com/AR-js-org/studio-backend/master/src/modules/marker/tools/gesture-handler.js"></script>
-    <title>***777***</title>
+    <!-- Animation Mixer を読み込む -->
+    <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js"></script>
+    <title>***１３***</title>
   </head>
   <body style="margin: 0; overflow: hidden">
 	  
@@ -25,24 +27,43 @@
 	    
       <!-- 3DCGモデルを読み込む -->
       <a-assets>
-        <a-asset-item id="neko" src="./asset/croissant.glb"></a-asset-item>
+        <a-asset-item id="neko" src="./asset/neko.glb"></a-asset-item>
+        <a-asset-item id="bed" src="./asset/bed.glb"></a-asset-item>
+        <a-asset-item id="croissant" src="./asset/croissant.glb"></a-asset-item>
       </a-assets>
 
       <!-- 環境光とライトの設定 -->
-      <a-entity light="type: ambient; intensity: 1.5; color: #FFF"></a-entity>
-      <a-entity light="type: directional; intensity: 1.5; color: #FFF" position="-1 1 0"></a-entity>
-      <a-entity light="type: directional; intensity: 1.5; color: #FFF" position="1 1 0"></a-entity>
+      <a-entity light="type: ambient; intensity: 2.0; color: #FFF"></a-entity>
+      <a-entity light="type: directional; intensity: 1.8; color: #FFF" position="-1 1 0"></a-entity>
+      <a-entity light="type: directional; intensity: 1.8; color: #FFF" position="1 1 0"></a-entity>
+      <a-entity light="type: point; intensity: 1.0; color: #FFF; distance: 5" position="0 2 0"></a-entity>
 
       <!-- マーカーの.pattファイルを読み込む -->
       <a-marker type="pattern" url="./asset/pattern-marker.patt">
         <!-- 3Dモデルを呼び出す -->
         <a-entity
           gltf-model="#neko"
-          gesture-handler="minScale: 0.25; maxScale: 10"
+          animation-mixer="clip: anime02; loop: repeat; repetitions: Infinity"
+          scale="2 2 2"
+          position="2 0 0"
+          rotation="0 0 0"
+          material="metalness: 0.3; roughness: 0.7">
+        </a-entity>
+
+        <a-entity
+          gltf-model="#croissant"
           scale="2 2 2"
           position="0 0 0"
           rotation="0 0 0"
-          material="metalness: 0.3; roughness: 0.7">
+          material="metalness: 0.2; roughness: 0.6; emissive: #222222; emissiveIntensity: 0.5">
+        </a-entity>
+
+        <a-entity
+          gltf-model="#bed"
+          scale="2 2 2"
+          position="0 0 2"
+          rotation="0 0 0"
+          material="metalness: 0.2; roughness: 0.6; emissive: #222222; emissiveIntensity: 0.5">
         </a-entity>
       </a-marker>
 
@@ -59,20 +80,29 @@
         // レンダラーの設定
         renderer.gammaOutput = true;
         renderer.gammaFactor = 2.2;
-        renderer.toneMappingExposure = 1.2;
+        renderer.toneMappingExposure = 1.5; // 露出を上げる
         
-        // モデルが読み込まれた後の処理
-        document.querySelector('[gltf-model]').addEventListener('model-loaded', function(ev) {
-          const mesh = ev.detail.model;
-          if (mesh && mesh.traverse) {
-            mesh.traverse((node) => {
-              if (node.isMesh) {
-                // マテリアルの調整
-                node.material.metalness = 0.3;
-                node.material.roughness = 0.7;
-              }
-            });
-          }
+        // すべてのgltfモデルにマテリアル設定を適用
+        document.querySelectorAll('[gltf-model]').forEach(model => {
+          model.addEventListener('model-loaded', function(ev) {
+            const mesh = ev.detail.model;
+            if (mesh && mesh.traverse) {
+              mesh.traverse((node) => {
+                if (node.isMesh) {
+                  // マテリアルの調整
+                  node.material.metalness = 0.2;  // 金属感をさらに下げる
+                  node.material.roughness = 0.6;  // 表面の粗さを調整
+                  node.material.envMapIntensity = 1.5;  // 環境マップの強度を上げる
+                  
+                  // croissantモデルの場合、追加の明るさ調整
+                  if (model.getAttribute('gltf-model') === '#croissant') {
+                    node.material.emissive.setRGB(0.2, 0.2, 0.2);  // わずかに発光を追加
+                    node.material.emissiveIntensity = 0.5;
+                  }
+                }
+              });
+            }
+          });
         });
       });
   </script>
