@@ -27,6 +27,8 @@
         init: function () {
           // 現在のアニメーション番号を保持
           this.currentAnimation = 1;
+          this.lastTapTime = 0;
+          this.tapDelay = 300; // ミリ秒
           
           // エンティティが読み込まれた後の処理
           this.el.addEventListener('model-loaded', () => {
@@ -35,16 +37,34 @@
             this.playAnimation('anime01');
           });
 
-          // 画面全体のクリック/タップイベントのリスナーを追加
-          document.body.addEventListener('click', () => {
-            if (this.el.sceneEl.is('vr-mode')) return; // VRモード時は無視
+          // 画面全体のイベントリスナーを追加（一つのハンドラーにまとめる）
+          const handleInteraction = (e) => {
+            e.preventDefault(); // デフォルトの動作を防止
+            
+            // VRモード時は無視
+            if (this.el.sceneEl.is('vr-mode')) return;
+            
+            // 現在時刻を取得
+            const currentTime = new Date().getTime();
+            
+            // 前回のタップからの経過時間をチェック
+            if (currentTime - this.lastTapTime < this.tapDelay) {
+              return; // 間隔が短すぎる場合は無視
+            }
+            
+            // 最終タップ時刻を更新
+            this.lastTapTime = currentTime;
+            
+            // アニメーション切り替え
             this.switchAnimation();
-          });
-          
-          document.body.addEventListener('touchstart', () => {
-            if (this.el.sceneEl.is('vr-mode')) return; // VRモード時は無視
-            this.switchAnimation();
-          });
+          };
+
+          // タッチデバイスの場合はtouchstart、それ以外はclickを使用
+          if ('ontouchstart' in window) {
+            document.body.addEventListener('touchstart', handleInteraction, { passive: false });
+          } else {
+            document.body.addEventListener('click', handleInteraction);
+          }
 
           // マーカー検出イベントの設定
           this.el.sceneEl.addEventListener('markerFound', () => {
@@ -79,7 +99,7 @@
         }
       });
     </script>
-    <title>***５－１***</title>
+    <title>***５－2***</title>
   </head>
   <body style="margin: 0; overflow: hidden">
 	  
