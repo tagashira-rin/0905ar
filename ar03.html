@@ -1,4 +1,4 @@
-<!-- マーカーを読み込んで３Ｄモデルを表示 + アニメーション再生 -->
+<!-- マーカーを読み込んで３Ｄモデルを表示 + アニメーション再生(anime01 → anime02 → anime03 → anime04)  -->
 
 <!DOCTYPE html>
 <html lang="ja">
@@ -14,7 +14,42 @@
     <script src="https://raw.githack.com/AR-js-org/studio-backend/master/src/modules/marker/tools/gesture-handler.js"></script>
     <!-- Animation Mixer を読み込む -->
     <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js"></script>
-    <title>***2***</title>
+    <script>
+      // アニメーション切り替えコンポーネントを定義
+      AFRAME.registerComponent('animation-sequence', {
+        init: function () {
+          // アニメーションの配列
+          this.animations = ['anime01', 'anime02', 'anime03', 'anime04'];
+          this.currentIndex = 0;
+          this.mixer = null;
+
+          // エンティティが読み込まれた後の処理
+          this.el.addEventListener('model-loaded', () => {
+            // 最初のアニメーションを開始
+            this.playCurrentAnimation();
+          });
+        },
+
+        playCurrentAnimation: function () {
+          // animation-mixerコンポーネントを更新
+          this.el.setAttribute('animation-mixer', {
+            clip: this.animations[this.currentIndex],
+            loop: 'once'
+          });
+
+          // アニメーション完了時の処理
+          const mixer = this.el.components['animation-mixer'].mixer;
+          if (mixer) {
+            mixer.addEventListener('finished', () => {
+              // 次のアニメーションに進む
+              this.currentIndex = (this.currentIndex + 1) % this.animations.length;
+              this.playCurrentAnimation();
+            });
+          }
+        }
+      });
+    </script>
+    <title>***3***</title>
   </head>
   <body style="margin: 0; overflow: hidden">
 	  
@@ -32,7 +67,7 @@
         <a-entity
           gltf-model="#neko"
           gesture-handler="minScale: 0.25; maxScale: 10"
-          animation-mixer="clip: anime02; loop: repeat; repetitions: Infinity"
+          animation-sequence
           scale="0.5 0.5 0.5"
           position="0 0 0"
           rotation="0 0 0">
