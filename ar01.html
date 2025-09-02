@@ -8,74 +8,9 @@
     <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
     <!-- AR.js を読み込む -->
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+    <!-- Gesture Handler を読み込む -->
+    <script src="https://raw.githack.com/AR-js-org/studio-backend/master/src/modules/marker/tools/gesture-handler.js"></script>
     <title>任意のページタイトル</title>
-    <script>
-      AFRAME.registerComponent('gesture-handler', {
-        schema: {
-          enabled: { default: true },
-          rotationFactor: { default: 5 },
-          scaleFactor: { default: 5 }
-        },
-        
-        init: function() {
-          this.handleScale = this.handleScale.bind(this);
-          this.handleRotation = this.handleRotation.bind(this);
-
-          this.isVisible = false;
-          this.initialScale = this.el.object3D.scale.clone();
-          this.scaleFactor = 1;
-
-          this.el.sceneEl.addEventListener('markerFound', (e) => {
-            this.isVisible = true;
-          });
-
-          this.el.sceneEl.addEventListener('markerLost', (e) => {
-            this.isVisible = false;
-          });
-        },
-
-        update: function() {
-          if (this.data.enabled) {
-            this.addListeners();
-          } else {
-            this.removeListeners();
-          }
-        },
-
-        addListeners: function() {
-          this.el.sceneEl.addEventListener('touchmove', this.handleRotation);
-          this.el.sceneEl.addEventListener('wheel', this.handleScale);
-        },
-
-        removeListeners: function() {
-          this.el.sceneEl.removeEventListener('touchmove', this.handleRotation);
-          this.el.sceneEl.removeEventListener('wheel', this.handleScale);
-        },
-
-        handleRotation: function(event) {
-          if (this.isVisible) {
-            this.el.object3D.rotation.y +=
-              event.movementX / this.data.rotationFactor;
-          }
-        },
-
-        handleScale: function(event) {
-          if (this.isVisible) {
-            this.scaleFactor *=
-              1 + event.deltaY / (this.data.scaleFactor * 100);
-            this.scaleFactor = Math.min(Math.max(0.25, this.scaleFactor), 10);
-
-            this.el.object3D.scale.x = this.scaleFactor * this.initialScale.x;
-            this.el.object3D.scale.y = this.scaleFactor * this.initialScale.y;
-            this.el.object3D.scale.z = this.scaleFactor * this.initialScale.z;
-          }
-        },
-
-        remove: function() {
-          this.removeListeners();
-        }
-      });
-    </script>
   </head>
   <body style="margin: 0; overflow: hidden">
 	  
@@ -92,7 +27,7 @@
         <!-- 3Dモデルを呼び出す -->
         <a-entity
           gltf-model="#neko"
-          gesture-handler
+          gesture-handler="minScale: 0.25; maxScale: 10"
           scale="0.5 0.5 0.5"
           position="0 0 0"
           rotation="0 0 0">
