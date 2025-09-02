@@ -1,0 +1,90 @@
+<!-- マーカーを読み込んで３Ｄモデルを表示 + 
+ アニメーション再生(anime05 
+ 画面をタップ or クリックされると、anime04 を再生  -->
+
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- A-Frame を読み込む -->
+    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+    <!-- AR.js を読み込む -->
+    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+    <!-- Gesture Handler を読み込む -->
+    <script src="https://raw.githack.com/AR-js-org/studio-backend/master/src/modules/marker/tools/gesture-handler.js"></script>
+    <!-- Animation Mixer を読み込む -->
+    <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js"></script>
+    <script>
+      // クリック/タップでアニメーションを切り替えるコンポーネント
+      AFRAME.registerComponent('animation-control', {
+        init: function () {
+          this.isPlaying = false;
+          
+          // エンティティが読み込まれた後の処理
+          this.el.addEventListener('model-loaded', () => {
+            // 最初のアニメーション（anime05）をループ再生
+            this.el.setAttribute('animation-mixer', {
+              clip: 'anime05',
+              loop: 'repeat'
+            });
+          });
+
+          // クリック/タップイベントのリスナーを追加
+          document.body.addEventListener('click', () => this.switchAnimation());
+          document.body.addEventListener('touchstart', () => this.switchAnimation());
+        },
+
+        switchAnimation: function () {
+          // anime04 を1回再生
+          this.el.setAttribute('animation-mixer', {
+            clip: 'anime04',
+            loop: 'once',
+            repetitions: 1
+          });
+
+          // アニメーション完了時の処理
+          const mixer = this.el.components['animation-mixer'].mixer;
+          if (mixer) {
+            mixer.addEventListener('finished', () => {
+              // anime04が終わったらanime05に戻る
+              this.el.setAttribute('animation-mixer', {
+                clip: 'anime05',
+                loop: 'repeat'
+              });
+            });
+          }
+        }
+      });
+    </script>
+    <title>***4***</title>
+  </head>
+  <body style="margin: 0; overflow: hidden">
+	  
+    <!-- A-FrameにAR.jsを紐づけ、VRボタン非表示、深度バッファ追加 -->
+    <a-scene embedded arjs vr-mode-ui="enabled: false;" renderer="logarithmicDepthBuffer: true;">
+	    
+      <!-- 3DCGモデルを読み込む -->
+      <a-assets>
+        <a-asset-item id="neko" src="./asset/neko.glb"></a-asset-item>
+      </a-assets>
+
+      <!-- マーカーの.pattファイルを読み込む -->
+      <a-marker type="pattern" url="./asset/pattern-marker.patt">
+        <!-- 3Dモデルを呼び出す -->
+        <a-entity
+          gltf-model="#neko"
+          gesture-handler="minScale: 0.25; maxScale: 10"
+          animation-control
+          scale="0.5 0.5 0.5"
+          position="0 0 0"
+          rotation="0 0 0">
+        </a-entity>
+      </a-marker>
+
+      <!-- カメラを追加 -->
+      <a-entity camera></a-entity>
+    </a-scene>
+  </body>
+</html>
