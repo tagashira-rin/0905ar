@@ -1,0 +1,80 @@
+<!-- マーカーを読み込んで３Ｄモデルを表示 bed （明るく） -->
+
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- A-Frame を読み込む -->
+    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+    <!-- AR.js を読み込む -->
+    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+    <!-- Gesture Handler を読み込む -->
+    <script src="https://raw.githack.com/AR-js-org/studio-backend/master/src/modules/marker/tools/gesture-handler.js"></script>
+    <title>***555***</title>
+  </head>
+  <body style="margin: 0; overflow: hidden">
+	  
+    <!-- A-FrameにAR.jsを紐づけ、VRボタン非表示、深度バッファ追加 -->
+    <a-scene embedded 
+             arjs 
+             vr-mode-ui="enabled: false;" 
+             renderer="logarithmicDepthBuffer: true; colorManagement: true; physicallyCorrectLights: true;"
+             exposure="1.5">
+	    
+      <!-- 3DCGモデルを読み込む -->
+      <a-assets>
+        <a-asset-item id="neko" src="./asset/bed.glb"></a-asset-item>
+      </a-assets>
+
+      <!-- 環境光とライトの設定 -->
+      <a-entity light="type: ambient; intensity: 1.1; color: #FFF"></a-entity>
+      <a-entity light="type: directional; intensity: 1.1; color: #FFF" position="-1 1 0"></a-entity>
+      <a-entity light="type: directional; intensity: 1.1; color: #FFF" position="1 1 0"></a-entity>
+
+      <!-- マーカーの.pattファイルを読み込む -->
+      <a-marker type="pattern" url="./asset/pattern-marker.patt">
+        <!-- 3Dモデルを呼び出す -->
+        <a-entity
+          gltf-model="#neko"
+          gesture-handler="minScale: 0.25; maxScale: 10"
+          scale="1 1 1"
+          position="0 0 0"
+          rotation="0 0 0"
+          material="metalness: 0.3; roughness: 0.7">
+        </a-entity>
+      </a-marker>
+
+      <!-- カメラを追加 -->
+      <a-entity camera></a-entity>
+    </a-scene>
+  </body>
+
+  <script>
+      // シーンが読み込まれた後の処理
+      document.querySelector('a-scene').addEventListener('loaded', function () {
+        const renderer = this.renderer;
+        
+        // レンダラーの設定
+        renderer.gammaOutput = true;
+        renderer.gammaFactor = 2.2;
+        renderer.toneMappingExposure = 1.2;
+        
+        // モデルが読み込まれた後の処理
+        document.querySelector('[gltf-model]').addEventListener('model-loaded', function(ev) {
+          const mesh = ev.detail.model;
+          if (mesh && mesh.traverse) {
+            mesh.traverse((node) => {
+              if (node.isMesh) {
+                // マテリアルの調整
+                node.material.metalness = 0.3;
+                node.material.roughness = 0.7;
+              }
+            });
+          }
+        });
+      });
+  </script>
+
+</html>
