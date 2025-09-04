@@ -14,7 +14,7 @@
     <script src="https://raw.githack.com/AR-js-org/studio-backend/master/src/modules/marker/tools/gesture-handler.js"></script>
     <!-- Animation Mixer を読み込む -->
     <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js"></script>
-    <title>***１３***</title>
+    <title>***20***</title>
   </head>
   <body style="margin: 0; overflow: hidden">
 	  
@@ -29,7 +29,7 @@
       <a-assets>
         <a-asset-item id="neko" src="./asset/neko.glb"></a-asset-item>
         <a-asset-item id="bed" src="./asset/bed.glb"></a-asset-item>
-        <a-asset-item id="croissant" src="./asset/croissant.glb"></a-asset-item>
+        <a-asset-item id="lamp" src="./asset/lamp.glb"></a-asset-item>
       </a-assets>
 
       <!-- 環境光とライトの設定 -->
@@ -44,15 +44,15 @@
         <a-entity
           gltf-model="#neko"
           animation-mixer="clip: anime02; loop: repeat; repetitions: Infinity"
-          scale="2 2 2"
-          position="2 0 0"
+          scale="1.2 1.2 1.2"
+          position="1.5 0 0"
           rotation="0 0 0"
           material="metalness: 0.3; roughness: 0.7">
         </a-entity>
 
         <a-entity
-          gltf-model="#croissant"
-          scale="2 2 2"
+          gltf-model="#lamp"
+          scale="7 7 7"
           position="0 0 0"
           rotation="0 0 0"
           material="metalness: 0.2; roughness: 0.6; emissive: #222222; emissiveIntensity: 0.5">
@@ -61,7 +61,7 @@
         <a-entity
           gltf-model="#bed"
           scale="2 2 2"
-          position="0 0 2"
+          position="-1.5 0 0"
           rotation="0 0 0"
           material="metalness: 0.2; roughness: 0.6; emissive: #222222; emissiveIntensity: 0.5">
         </a-entity>
