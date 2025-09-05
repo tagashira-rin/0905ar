@@ -17,14 +17,14 @@
 	    
       <!-- 3DCGモデルを読み込む -->
       <a-assets>
-        <a-asset-item id="neko" src="./asset/neko.glb"></a-asset-item>
+        <a-asset-item id="neko" src="./asset/hamburger.glb"></a-asset-item>
         
       </a-assets>
 
       <!-- マーカーの.pattファイルを読み込む -->
       <a-marker type="pattern" url="./asset/pattern-marker.patt">
         <!-- 3Dモデルを呼び出す -->
-        <a-entity gltf-model="#neko" rotation="0 0 0" scale="1 1 1" position="0 0 0"></a-entity>
+        <a-entity gltf-model="#neko" rotation="-90 0 0" scale="1 1 1" position="0 0 0"></a-entity>
       </a-marker>
 
       <!-- カメラを追加 -->
